@@ -1,0 +1,839 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>HRMS || Payslip</title>
+<style type="text/css">
+body {
+	background-color: #FFFFFF;
+	background-image: url(/hrms-ess/resources/images/backgr11.jpg);
+	background-repeat: repeat-x;
+}
+
+.pay_header {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-style: normal;
+	color: #606060;
+	text-align: center;
+	font-weight: 500;
+}
+
+.pay_style {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	font-stretch: normal;
+	color: #606060;
+	text-align: center;
+}
+
+.link_text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-stretch: normal;
+	font-style: normal;
+	color: #0000CC; /*#30517e;*/
+	text-align: center;
+	font-weight: normal;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+table.masterDataGrid tr.evenR.row_selected td {
+	background-color: #B0BED9;
+}
+
+table.masterDataGrid tr.oddR.row_selected td {
+	background-color: #9FAFD1;
+}
+
+.jqmWindow {
+	display: none;
+	position: fixed;
+	top: 17%;
+	left: 50%;
+	margin-left: -300px;
+	width: 600px;
+	background-color: #EEE;
+	color: #333;
+	border: 1px solid black;
+	padding: 12px;
+}
+
+.jqmOverlay {
+	background-color: #000;
+}
+
+/* Fixed posistioning emulation for IE6
+     Star selector used to hide definition from browsers other than IE6
+     For valid CSS, use a conditional include instead */
+* html .jqmWindow {
+	position: absolute;
+	top: expression(( document.documentElement.scrollTop ||  
+		document.body.scrollTop)+  Math.round(17*  (document.documentElement.offsetHeight||
+		 document.body.clientHeight )/100 )+  'px' );
+}
+
+/*tooltip css*/
+a.tooltip1 {
+	outline: none;
+}
+
+a.tooltip1 strong {
+	line-height: 30px;
+}
+
+a.tooltip1:hover {
+	text-decoration: none;
+}
+
+a.tooltip1 span {
+	z-index: 10;
+	display: none;
+	margin-top: -30px;
+	margin-left: 28px;
+	line-height: 16px;
+}
+
+a.tooltip1:hover span {
+	display: inline;
+	position: absolute;
+	color: #111;
+	border: 1px solid #DCA;
+	background: #fffAF0;
+}
+
+.callout {
+	z-index: 20;
+	position: absolute;
+	top: 30px;
+	border: 0;
+	right: -12px;
+}
+
+/*CSS3 extras*/
+a.tooltip1 span {
+	border-radius: 4px;
+	box-shadow: 5px 5px 8px #CCC;
+}
+</style>
+	
+
+<script type="text/javascript" src="/hrms-ess/resources/js/common.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/js/lovscripts.js"></script>
+<link rel="stylesheet" type="text/css" href="/hrms-ess/resources/css/finance_style2.css" />
+<script type="text/javascript" src="/hrms-ess/resources/js/Maskdiv.js">
+</script>
+
+
+<style type="text/css">
+/*Added by Ankur*/
+div.MaskedDiv
+{
+	visibility: hidden;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:verdana;
+	font-weight:bold;
+	padding:40px;
+    z-index:100;
+	background-image:url(/hrms-ess/resources/images/Mask.png);
+	/* ieWin only stuff */
+	_background-image:none;
+	-ms-filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=scale src='/images/Mask.png');
+}
+#MaskedDivImage {
+	position: absolute;
+	visibility: hidden;
+	width: 100px;
+	height: 70px;
+	left: 20px;
+	top: 0px;
+	/*background-color : #F0F8FF;
+	/*background-image : url(/hrms-ess/resources/images/loadinfo.gif);*/
+	/*border: 1px solid #000;*/
+	/*padding: 2px;*/
+	z-index:100;
+	vertical-align: middle;
+
+}
+</style>
+
+
+<div id="MaskedDiv" class ="MaskedDiv">
+</div>
+<div id="MaskedDivImage" class ="MaskedDivImage" align="center">
+  <table align="center">
+    <tr valign="top">
+      <td align="center">
+        <img alt="processing" src='/hrms-ess/resources/images/processing.gif'>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Processing..
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+<script>
+ window.onbeforeunload=BlockBackWindow;
+ // ClosePopup();
+</script>
+
+
+
+
+<link type="text/css" rel="stylesheet" href="/hrms-ess/resources/jquery/css/jquery.dataTables.css" />
+<link type="text/css" rel="stylesheet" href="/hrms-ess/resources/jquery/css/jquery.loadmask.css" />
+<link type="text/css" rel="stylesheet" href="/hrms-ess/resources/jquery/css/jquery.tooltip.css" />
+<link type="text/css" rel="stylesheet" href="/hrms-ess/resources/jquery/css/jqModal.css" />
+<link type="text/css" rel="stylesheet" href="/hrms-ess/resources/jquery/css/jquery-ui-1.8.17.custom.css" />
+
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery-1.7.2.min.js"></script> 
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.ui.datepicker.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.formrestrict.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.alphanumeric.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.filestyle.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/hrms-ess/resources/jquery/js/jquery.tools.min.js"></script>
+
+
+<script type="text/javascript"  src="/hrms-ess/resources/jquery/js/jquery.loadmask.min.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/autoNumeric.js"></script>
+<script type="text/javascript" charset="utf-8" src="/hrms-ess/resources/jquery/js/jquery.popupWindow.js"></script>
+<script type="text/javascript" charset="utf-8" src="/hrms-ess/resources/jquery/js/jqModal.js"></script>
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.autocomplete.js"></script>
+
+
+<script type="text/javascript" src="/hrms-ess/resources/jquery/js/jquery.dataTables.columnFilter.js"></script>
+
+
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+    $('th[title], td[title], a[title], input[title], textarea[title], .help[title],.edit[title],.deleterow[title],.addnew[title],.search-button[title],img[title]').tooltip({
+        "delay": 0,
+        "track": true,
+        "fade": 250,
+        "showURL": false,
+        "tooltipBGColor": 'rgb(238, 238, 238)',
+        "borderColor": 'rgb(17, 17, 17)'
+    }).dynamic({ bottom: { direction: 'down', bounce: true } });
+    $.fn.dataTableExt.aTypes.unshift(function(sData) {
+        if (sData !== null && sData.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d$/)) {
+            return 'uk_date';
+        }
+        return null;
+    });
+    $.fn.dataTableExt.oSort['uk_date-asc'] = function(a, b) {
+        var ukDatea = a.split('/');
+        var ukDateb = b.split('/');
+        var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+        var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    };
+    $.fn.dataTableExt.oSort['uk_date-desc'] = function(a, b) {
+        var ukDatea = a.split('/');
+        var ukDateb = b.split('/');
+        var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+        var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+    }; /* Create an array with the values of all the input boxes in a column */
+    $.fn.dataTableExt.afnSortData['dom-text'] = function(oSettings, iColumn) {
+        var aData = [];
+        $('td:eq(' + iColumn + ') input', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
+            aData.push(this.value);
+        });
+        return aData;
+    };
+    /* Create an array with the values of all the select options in a column */
+    $.fn.dataTableExt.afnSortData['dom-select'] = function(oSettings, iColumn) {
+        var aData = [];
+        $('td:eq(' + iColumn + ') select', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
+            aData.push($(this).val());
+        });
+        return aData;
+    };
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTableExt.afnSortData['dom-checkbox'] = function(oSettings, iColumn) {
+        var aData = [];
+        $('td:eq(' + iColumn + ') input', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
+            aData.push(this.checked == true ? "1" : "0");
+        });
+        return aData;
+    };
+    $('input[type=password]').bind('cut copy paste', function(e) {
+        e.preventDefault();
+    });
+	$(document).bind("contextmenu",function(e){
+	    return false;
+	});
+    /*$("textarea").live("cut copy paste", function(e) {
+        e.preventDefault();
+    });*/
+
+    $('input[type=text]').attr('autocomplete', 'off');
+
+    setNavigation();
+
+    $(':input:text:visible:enabled:not([readonly]):first').focus();
+
+    $('.UPPER').live('keydown', function() {
+        $(this).toUpperCase();
+    });
+}); /* Get the rows which are currently selected */
+
+function setNavigation(){
+	$('input[readonly="readonly"]').each(function() {
+        $(this).removeAttr('tabindex').attr('tabindex', '-1');
+    });
+}
+
+function fnGetSelected(oTableLocal) {
+    var aReturn = new Array();
+    var aTrs = oTableLocal.fnGetNodes();
+    for (var i = 0; i < aTrs.length; i++) {
+        if ($(aTrs[i]).hasClass('row_selected')) {
+            aReturn.push(aTrs[i]);
+        }
+    }
+    return aReturn;
+}
+
+function fnGetSelectedData(oTableLocal) {
+    var anSelected = fnGetSelected(oTableLocal);
+    var line = '';
+    for (var i = 0, j = anSelected.length; i < j; i++) {
+        for (var k = 0, l = oTable.fnGetData(anSelected[i]).length; k < l; k++) {
+            line = line + '#' + oTable.fnGetData(anSelected[i])[k];
+        }
+        line = line + '&&';
+    }
+    return line;
+}
+
+$.fn.toUpperCase = function() {
+    return this.each(function() {
+        var el = $(this);
+        if (el.is(':input:not(select,textarea)')) {
+            el.val(el.val().toUpperCase());
+        } else if (el.is('select')) {
+            el.children().each(function() {
+                var opt = $(this);
+                opt.text(opt.text().toUpperCase());
+            });
+        } else if (el.is('textarea')) {
+            el.text(el.text().toUpperCase());
+        } else {
+            el.contents().filter(function() {
+                return this.nodeType !== 1;
+            }).each(function() {
+                var obj = $(this);
+                obj.text(obj.text().toUpperCase());
+            });
+        }
+    });
+};
+
+function download(form) {
+    $('body').append('');
+    $('#tmpiframe').hide().attr('src', $(form).attr('action'));
+    $(form).submit();
+}
+
+function setupLOV(fId, bId, fName) {
+	//alert('fId--'+fId);
+	//alert('bId--'+bId);
+	//alert('fName--'+fName);
+    if ($('#' + fId).is('[readonly]')) {
+    	//alert('if');
+        $('#' + bId).unbind('click');
+        $('#' + bId).hide();
+        $('#' + fId).unbind('keydown');
+        return;
+    } 
+    $('#' + bId).show();
+    $('#' + bId).live("click", function() {
+        eval(fName + '()');
+    });
+    $('#' + fId).live("keydown", function(e) {
+        if (e.which == 120) eval(fName + '()');
+    });
+}
+
+function setupRowLOV(fId, bId, fName, itr) {
+    if ($('#' + fId + itr).is('[readonly]')) {
+        $('#' + bId + itr).unbind('click');
+        $('#' + bId + itr).hide();
+        $('#' + fId + itr).unbind('keydown');
+        return;
+    }
+    $('#' + bId + itr).show();
+    $('#' + bId + itr).live("click", function() {
+        eval(fName + '(' + itr + ')');
+    });
+    $('#' + fId + itr).live("keydown", function(e) {
+        if (e.which == 120) eval(fName + '(' + itr + ')');
+    });
+}
+
+$.fn.disable = function() {
+	return this.each(function() {
+		if (typeof this.disabled != "undefined") {
+			this.disabled = true;
+			$(this).addClass('true');
+		}
+	});
+};
+
+$.fn.enable = function() {
+	return this.each(function() {
+		if (typeof this.disabled != "undefined") {
+			this.disabled = false;
+			$(this).removeClass('true');
+		}
+	});
+};
+
+function pageMusk() {
+	$('body').mask("Processing please wait...");
+}
+function pageUnmusk() {
+
+}
+function validExtension(fileName, allowedExtension) {
+    if ($.inArray(fileName.split('.').pop().toLowerCase(), allowedExtension) == -1) {
+        alert('Not a valid extension. Allowed extensions are: ' + allowedExtension);
+        return false;
+    }
+    return true;
+}
+</script>
+
+
+</head>
+<body>
+ 
+	<input type="hidden" value="2023" id="currentYear">
+	<input type="hidden" value="2023" id="operatingYear">
+
+	<TABLE border=0 cellSpacing=0 cellPadding=0 width="100%">
+		<TBODY>
+			<TR>
+				<TD height=1 colspan="2" align="left" valign="middle"
+					bgcolor="#4297d7"></TD>
+			</TR>
+			<TR>
+				<TD width="85%" height=20 align="left" valign="middle"
+					bgcolor="#4297d7" class="Registration">&nbsp;&nbsp;Payslip</TD>
+				<TD width="15%" align="left" valign="middle" bgcolor="#4297d7"
+					class="form_textbold">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD height=1 colspan="2" align="left" valign="middle"
+					bgcolor="#4297d7" class="Registration"></TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+	
+		<!-- MESSAGE SECTION START -->
+
+
+
+	 
+	 <table width="97%" border="0" align="center" cellpadding="0" cellspacing="0">
+	  
+	  	
+	 </table>
+
+<!-- MESSAGE SECTION END -->
+
+
+
+
+	<p>&nbsp;</p>
+	<div align="center">
+		<table width="50%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="2%" rowspan="5" align="right" valign="top" class="logout">
+					<img src="/hrms-ess/resources/images/Payslips_slice_11.jpg"
+					width="20" height="437" alt="">
+				</td>
+				<td height="25" align="center" valign="middle" bgcolor="#0a62a4"
+					class="logout">&nbsp;</td>
+				<td height="25" colspan="3" align="center" valign="middle"
+					bgcolor="#0a62a4" class="logout">&nbsp;&nbsp;</td>
+			</tr>
+			<tr>
+				<td width="16%" height="25" align="center" valign="middle"
+					bgcolor="#FFFFFF" class="logout"><img
+					src="/hrms-ess/resources/images/Payslips_slice_06.jpg"
+					width="156" height="47" alt=""></td>
+
+				<td colspan="3" align="center" valign="middle" bgcolor="#FFFFFF"
+					class="logout">&nbsp;</td>
+			</tr>
+			<tr>
+				<td height="25" rowspan="2" align="center" valign="middle"
+					bgcolor="#4297d7" class="logout">&nbsp;</td>
+				<td width="6%" align="right" valign="top" bgcolor="#FFFFFF"
+					class="logout"><a href="#"> <img id="previousPage"
+						src="/hrms-ess/resources/images/Payslips_slice_12.jpg"
+						width="60" height="28" alt="" border="0">
+
+				</a></td>
+				<td width="65%" align="center" valign="top" bgcolor="#FFFFFF"
+					class="logout"><table width="100%" border="0" cellspacing="0"
+						cellpadding="0">
+						<tr>
+							<td width="40%" rowspan="3"><img
+								src="/hrms-ess/resources/images/Payslips_slice_133.jpg"
+								width="277" height="28"></td>
+
+							<td width="14%" align="center" valign="top"><img
+								src="/hrms-ess/resources/images/Payslips_slice_114.jpg"
+								width="66" height="4"></td>
+
+							<td width="46%" rowspan="3"><img
+								src="/hrms-ess/resources/images/Payslips_slice_155.jpg"
+								width="295" height="28"></td>
+
+						</tr>
+						<tr>
+							<td height="19" bgcolor="#F2F2F2" class="pay_header"><strong>2023</strong></td>
+						</tr>
+						<tr>
+							<td><img
+								src="/hrms-ess/resources/images/Payslips_slice_120.jpg"
+								width="66" height="4"></td>
+
+						</tr>
+					</table></td>
+				<td width="11%" align="left" valign="top" bgcolor="#FFFFFF" class="logout">
+					<a href="#"> 
+						<img id="nextPage" src="/hrms-ess/resources/images/Payslips_slice_14.jpg"
+							width="43" height="28" alt="" border="0">
+						</a>
+			</td>
+			</tr>
+			<tr>
+				<td width="6%" height="339" align="right" valign="top"
+					bgcolor="#FFFFFF" class="logout">&nbsp;</td>
+				<td align="left" valign="top" bgcolor="#FFFFFF" class="logout">
+				
+
+					<table	width="97%" border="0" cellspacing="0" cellpadding="0" id="payslipTable2" style="height: auto;" align="left">
+					
+
+						
+							<tr height="120px;" align="left">
+								
+									<td valign="top" class="pay_style">
+										<input type="hidden" id="docStatus_00" 					value="OK">
+										<input type="hidden" id="docIntPayBillGroupId_00" 		value="202301201326224752830001952228207">
+										<input type="hidden" id="docIntEssPayslipMonthYear_00" 	value="202301242001503546350009364681330">
+										<input type="hidden" id="docDId_00" 						value="60272840">
+										<input type="hidden" id="docCId_00" 						value="172172170700360402699">
+										<input type="hidden" id="docYear_00" 						value="2023">
+										<input type="hidden" id="docMonth_00" 					value="JAN">
+										<input type="hidden" id="docPayslipAvailable_00"			value="true">
+										
+										<div id="div_00">
+											<a href="#" id="viewPayslip_00" style="display: none;">
+												<img src="/hrms-ess/resources/images/Payslips_slice_18.jpg" id="viewPayslipImg_00"
+													width="42" height="43" alt="" border="0">
+											</a>
+											
+											
+												
+											<br>
+											January
+											<br>
+											
+										</div>
+									</td>
+								
+									<td valign="top" class="pay_style">
+										<input type="hidden" id="docStatus_01" 					value="OK">
+										<input type="hidden" id="docIntPayBillGroupId_01" 		value="202302141332191397260007674668636">
+										<input type="hidden" id="docIntEssPayslipMonthYear_01" 	value="202302212000442926320001838511467">
+										<input type="hidden" id="docDId_01" 						value="60569869">
+										<input type="hidden" id="docCId_01" 						value="172172170700360699728">
+										<input type="hidden" id="docYear_01" 						value="2023">
+										<input type="hidden" id="docMonth_01" 					value="FEB">
+										<input type="hidden" id="docPayslipAvailable_01"			value="true">
+										
+										<div id="div_01">
+											<a href="#" id="viewPayslip_01" style="display: none;">
+												<img src="/hrms-ess/resources/images/Payslips_slice_18.jpg" id="viewPayslipImg_01"
+													width="42" height="43" alt="" border="0">
+											</a>
+											
+											
+												
+											<br>
+											February
+											<br>
+											
+										</div>
+									</td>
+								
+									<td valign="top" class="pay_style">
+										<input type="hidden" id="docStatus_02" 					value="OK">
+										<input type="hidden" id="docIntPayBillGroupId_02" 		value="20230320133043424564000452833998">
+										<input type="hidden" id="docIntEssPayslipMonthYear_02" 	value="202304012002576074150008951754273">
+										<input type="hidden" id="docDId_02" 						value="62037756">
+										<input type="hidden" id="docCId_02" 						value="172172170700362167615">
+										<input type="hidden" id="docYear_02" 						value="2023">
+										<input type="hidden" id="docMonth_02" 					value="MAR">
+										<input type="hidden" id="docPayslipAvailable_02"			value="true">
+										
+										<div id="div_02">
+											<a href="#" id="viewPayslip_02" style="display: none;">
+												<img src="/hrms-ess/resources/images/Payslips_slice_18.jpg" id="viewPayslipImg_02"
+													width="42" height="43" alt="" border="0">
+											</a>
+											
+											
+												
+											<br>
+											March
+											<br>
+											
+										</div>
+									</td>
+								
+							</tr>
+						
+						
+					</table>
+					
+					
+
+					
+					</td>
+				<td width="11%" align="left" valign="top" bgcolor="#FFFFFF"
+					class="logout">&nbsp;</td>
+			</tr>
+			<tr>
+				<td height="37" colspan="3" align="left" valign="top"><img
+					src="/hrms-ess/resources/images/Payslips_slice_35.jpg"
+					width="820" height="27"></td>
+
+				<td align="left" valign="top" bgcolor="#FFFFFF" class="logout">&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+	<div align="center"></div>
+	<div align="center"></div>
+	
+	<form id="payslipUcmBean" action="/hrms-ess/employee/payslip.html" method="POST">
+		<input id="payslipUcmBean-intPayBillGroupId" name="intPayBillGroupId" type="hidden" value=""/>
+		<input id="payslipUcmBean-intEssPayslipMonthYear" name="intEssPayslipMonthYear" type="hidden" value=""/>
+		<input id="payslipUcmBean-year" name="year" type="hidden" value=""/>
+		<input id="payslipUcmBean-month" name="month" type="hidden" value=""/>
+		<input id="payslipUcmBean-payslipAvailable" name="payslipAvailable" type="hidden" value="false"/>
+		<input id="payslipUcmBean-processingStage" name="processingStage" type="hidden" value=""/>
+		<input type="submit" id="payslipUcmSubmitBtn" name="payslipUcmSubmit" style="display: none;">
+	</form>	
+
+</body>
+<script type="text/javascript" charset="utf-8"
+	src="/hrms-ess/resources/jquery/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript">
+	
+	var documentUrl = '/hrms-ess/../hrms-services/api/report/pdf?';
+	var processingStage = ['OK', 'ERROR', 'NOTGENERATED', 'PROCESSING'];
+	var month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+				"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+				
+	$(document).ready(function() {
+		/*
+		*Load on page loading and apply appropriate sign to doc
+		*/
+		$('input[id^="docStatus_"]').each(function(){
+			var idx = this.id.split('_')[1];
+			var status = $('#docStatus_' + idx).val();
+			
+			if( status == processingStage[0]){
+				//OK
+				$('#viewPayslip_' + idx).show();
+				$('#viewPayslipImg_' + idx).show();
+				$('#loader_doc_' + idx).hide();
+				$('#notavailable_doc_' + idx).hide();
+			}else if(status == processingStage[1]){
+				//Error
+				$('#viewPayslip_' + idx).hide();
+				$('#loader_doc_' + idx).hide();
+				$('#notavailable_doc_' + idx).show();
+			}else if(status == processingStage[2]){
+				//NOTGENERATED
+				$('#viewPayslip_' + idx).hide();
+				$('#loader_doc_' + idx).hide();
+				$('#notavailable_doc_' + idx).show();
+			}else if(status == processingStage[3]){
+				//PROCESSING
+				$('#viewPayslip_' + idx).hide();
+				$('#loader_doc_' + idx).show();
+				$('#notavailable_doc_' + idx).hide();
+			}else{
+				$('#viewPayslip_' + idx).hide();
+				$('#loader_doc_' + idx).hide();
+				$('#notavailable_doc_' + idx).show();
+			}
+		});
+		
+		/*
+		* Display payslip on clicking 
+		*/
+		$('a[id^="viewPayslip_"]').click(function(){
+			var idx = this.id.split('_')[1];
+			
+			if($('#docPayslipAvailable_' + idx).val() == 'true'){
+				//View payslip from UCM
+				viewdoc($('#docDId_' + idx).val(), $('#docCId_' + idx).val());	
+			}else{
+				//Submit page for payslip generation
+				$('#payslipUcmBean-intPayBillGroupId').val( $('#docIntPayBillGroupId_' + idx).val() );
+				$('#payslipUcmBean-intEssPayslipMonthYear').val( $('#docIntEssPayslipMonthYear_' + idx).val() );
+				$('#payslipUcmBean-year').val( $('#docYear_' + idx).val() );
+				$('#payslipUcmBean-month').val( $('#docMonth_' + idx).val() );
+				$('#payslipUcmBean-payslipAvailable').val( $('#docPayslipAvailable_' + idx).val() );
+				$('#payslipUcmBean-processingStage').val( $('#docStatus_' + idx).val() );
+				
+
+				
+				$('#payslipUcmSubmitBtn').click();
+			}
+		});
+		
+		/*
+		* Refresh payslip on clicking 
+		*/
+		$('a[id^="refresh_doc_"]').click(function(){
+			var _confirm = confirm('DO YOU WANT TO REFRESH PAYSLIP?' 
+							+ '\nNote: Use only if required for payslip regeneration.');
+			if(_confirm){
+				var idx = this.id.split('_')[2];
+				refreshDoc(idx);
+			}
+		});
+	
+		
+		$('#previousPage').click(function(){
+			getPayslipScreen(parseInt($('#operatingYear').val())-1);
+		});
+		
+		$('#nextPage').click(function(e){
+			var curYear = parseInt($('#currentYear').val());
+			var optYear = parseInt($('#operatingYear').val()) + 1 ;
+		
+			if( optYear > curYear)
+				e.preventDefault();
+			else
+				getPayslipScreen(optYear);
+		});
+		
+		/*
+		* Periodically retrieve doc status
+		*/
+		retrieveDocStatusAll();
+	});
+
+	
+	function viewdoc(dId, cId){
+		//window.open('?dId=' + dId + '&cId=' + cId, '_blank');
+		window.open(documentUrl + 'dId=' + dId + '&cId=' + cId, '_self');
+	}
+	
+	function refreshDoc(idx){
+		$.ajax({
+			  type: "GET", 
+	          url:	'?year=' + $('#docYear_' + idx).val() + '&month=' + $('#docMonth_' + idx).val() + '&intPayBillGroupId=' + $('#docIntPayBillGroupId_' + idx).val()
+	        		  	+ '&intEssPayslipMonthYear=' + $('#docIntEssPayslipMonthYear_' + idx).val(),
+	          async : false,
+	          cache : false,
+	          success: function (responseData) {
+	          console.log('responseData.STATUS ' + responseData.STATUS);
+	          		if(responseData.STATUS == 0){
+	          			$('#docStatus_' + idx).val(processingStage[3]);
+	          			
+	          			$('#viewPayslip_' + idx).hide();
+	          			$('#notavailable_doc_' + idx).hide();
+	          			$('#loader_doc_' + idx).show();
+	          		}else{
+	          			alert('Can not refresh payslip.\n' + responseData.MESSAGE);
+	          		}
+	        	  		
+				},
+			   error: function (jqXHR, textStatus, errorThrown) {
+	                    alert('Internal error: ' + jqXHR.responseText);
+	          }
+		  });
+	}
+	
+	function getPayslipScreen(year){
+		window.location = '/hrms-ess/employee/payslip.html?year=' + year;
+	}
+	
+	
+	function retrieveDocStatusAll(){
+		console.log('Calling timer...');
+		
+		$('input[id^="docStatus_"]').each(function(){
+			var idx = this.id.split('_')[1];
+			retrieveDocStatus(idx);
+		});
+		
+		setTimeout(retrieveDocStatusAll, 5000);
+	}
+	
+	
+	function retrieveDocStatus(idx){
+		//If status is in processing stage then only retrieve updated status
+		console.log('doc status...');
+		if($('#docStatus_' + idx).val() == processingStage[3]){
+			console.log('doc status... ' + '#docStatus_' + idx);
+			$.ajax({
+				  type: "GET", 
+		          url:	'?docStatus&year=' + $('#docYear_' + idx).val() + '&month=' + $('#docMonth_' + idx).val()
+		        		  	+ '&intEssPayslipMonthYear=' + $('#docIntEssPayslipMonthYear_' + idx).val(),
+		          async : false,
+		          cache : false,
+		          success: function (responseData) {
+		        	  console.log(responseData);
+		          		console.log('responseData.STATUS ' + responseData.STATUS);
+		          		if(responseData.STATUS == processingStage[0]){
+		          			//Ok
+		          			$('#docStatus_' + idx).val(processingStage[0]);
+		          			$('#docDId_' + idx).val(responseData.dId);
+		          			$('#docCId_' + idx).val(responseData.cId);
+		          			
+		          			$('#viewPayslip_' + idx).show();
+		          			$('#notavailable_doc_' + idx).hide();
+		          			$('#loader_doc_' + idx).hide();
+		          		}else if(responseData.STATUS == processingStage[3]){
+		          			//Do nothing
+		          		}else{
+		          			$('#viewPayslip_' + idx).hide();
+		          			$('#notavailable_doc_' + idx).show();
+		          			$('#loader_doc_' + idx).hide();
+		          		}
+		        	  		
+					},
+				   error: function (jqXHR, textStatus, errorThrown) {
+		                    alert('Internal error: ' + jqXHR.responseText);
+		          }
+			});	
+		}
+	}
+</script>
+</html>
